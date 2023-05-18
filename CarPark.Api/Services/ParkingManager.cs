@@ -55,7 +55,21 @@ public class ParkingManager : IParkingManager
 
     private decimal CalculateDailyPrice(DateTime date)
     {
-        return 10.0M;
+        decimal weekDayPrice = 10.0M;
+        decimal weekendPrice = 15.0M;
+
+        if (IsWeekend(date))
+        {
+            return weekendPrice;
+        }
+
+        return weekDayPrice;
+    }
+
+    private bool IsWeekend(DateTime date)
+    {
+        // Check if the given date falls on a weekend (Saturday or Sunday)
+        return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
     }
 }
 
