@@ -1,4 +1,6 @@
-﻿namespace CarPark.Api.Services;
+﻿using System.Net.Sockets;
+
+namespace CarPark.Api.Services;
 
 
 public interface IParkingManager
@@ -26,6 +28,28 @@ public class ParkingManager : IParkingManager
             { new DateTime(2023, 1, 9), 10 },
             { new DateTime(2023, 1, 10), 9 }
         };
+    }
+
+    public void ReserveParking(DateTime from, DateTime to)
+    {
+        if (IsParkingAvailable(from, to))
+        {
+            for (DateTime date = from; date <= to; date = date.AddDays(1))
+            {
+                if (_reservations.ContainsKey(date))
+                {
+                    _reservations[date] += 1;
+                }
+                else
+                {
+                    _reservations[date] = 1;
+                }
+            }
+        }
+        else
+        {
+            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
+        }
     }
 
     public bool IsParkingAvailable(DateTime from, DateTime to)
@@ -84,8 +108,6 @@ public class ParkingManager : IParkingManager
         pricePerDay += weekDayPrice;
 
         return pricePerDay;
-
-
     }
 
     private bool IsWeekend(DateTime date)
@@ -102,4 +124,9 @@ public class ParkingManager : IParkingManager
     {
         return date.Month == 12 || date.Month <= 2;
     }
+}
+
+public class UnableToReserveSpaceException : Exception
+{
+    public UnableToReserveSpaceException(string message) : base(message) { }
 }
