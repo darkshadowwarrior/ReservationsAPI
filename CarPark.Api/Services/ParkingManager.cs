@@ -57,19 +57,49 @@ public class ParkingManager : IParkingManager
     {
         decimal weekDayPrice = 10.0M;
         decimal weekendPrice = 15.0M;
+        decimal summerPriceIncrease = 12.0M;
+        decimal winterPriceIncrease = 8.0M;
+
+        decimal pricePerDay = 0.0M;
+
+        if (IsSummer(date))
+        {
+            pricePerDay += summerPriceIncrease;
+        }
+        else if (IsWinter(date))
+        {
+            pricePerDay += winterPriceIncrease;
+        }
 
         if (IsWeekend(date))
         {
-            return weekendPrice;
+            pricePerDay += weekendPrice;
+            return pricePerDay;
         }
 
-        return weekDayPrice;
+        pricePerDay += weekDayPrice;
+
+        return pricePerDay;
+
+
     }
 
     private bool IsWeekend(DateTime date)
     {
         // Check if the given date falls on a weekend (Saturday or Sunday)
         return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+    }
+
+    private bool IsSummer(DateTime date)
+    {
+        // Define your summer season criteria here
+        // For example, assuming summer season is from June 1 to August 31
+        return date.Month >= 6 && date.Month <= 8;
+    }
+
+    private bool IsWinter(DateTime date)
+    {
+        return date.Month == 12 || date.Month <= 2;
     }
 }
 
