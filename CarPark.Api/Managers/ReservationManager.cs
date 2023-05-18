@@ -80,6 +80,10 @@ public class ReservationManager : IReservationManager
 
             _reservationsRepository.RemoveReservation(name);
         }
+        else
+        {
+            throw new ReservationNotFoundException("ReservationNotFoundException: Reservation not found in reservations");
+        }
     }
 
     public bool IsParkingAvailable(DateTime from, DateTime to)
@@ -151,6 +155,11 @@ public class ReservationManager : IReservationManager
     {
         return date.Month is 12 or <= 2;
     }
+}
+
+public class ReservationNotFoundException : Exception
+{
+    public ReservationNotFoundException(string message) : base(message) { }
 }
 
 public class UnableToReserveSpaceException : Exception

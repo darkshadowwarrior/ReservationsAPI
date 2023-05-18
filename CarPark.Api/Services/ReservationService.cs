@@ -49,7 +49,7 @@ namespace CarPark.Api.Services
             catch (Exception)
             {
                 response.Status =
-                    "Unable to reserved booking due to insufficient spaces available for the give date range";
+                    "Unable to reserved booking due to insufficient spaces available for the given date range";
             }
 
             return response;
@@ -69,7 +69,7 @@ namespace CarPark.Api.Services
             }
             catch (Exception)
             {
-                response.Status = "Unable to cancel reservation";
+                response.Status = "Unable to find reservation!";
             }
 
             return response;
