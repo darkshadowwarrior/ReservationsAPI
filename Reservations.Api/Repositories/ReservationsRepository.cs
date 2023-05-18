@@ -1,6 +1,6 @@
-﻿using CarPark.Api.Models;
+﻿using Reservations.Api.Models;
 
-namespace CarPark.Api.Repositories;
+namespace Reservations.Api.Repositories;
 
 public interface IReservationsRepository
 {

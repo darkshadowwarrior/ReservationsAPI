@@ -1,4 +1,4 @@
-﻿namespace CarPark.Api.Managers;
+﻿namespace Reservations.Api.Managers;
 
 public interface IParkingSpaceManager
 {

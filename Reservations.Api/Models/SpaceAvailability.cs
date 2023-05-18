@@ -1,4 +1,4 @@
-﻿namespace CarPark.Api.Models;
+﻿namespace Reservations.Api.Models;
 
 public class SpaceAvailability
 {

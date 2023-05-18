@@ -1,7 +1,7 @@
-﻿using CarPark.Api.Managers;
-using CarPark.Api.Models;
+﻿using Reservations.Api.Managers;
+using Reservations.Api.Models;
 
-namespace CarPark.Api.Services
+namespace Reservations.Api.Services
 {
     public interface IReservationService
     {

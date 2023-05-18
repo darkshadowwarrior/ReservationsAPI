@@ -1,8 +1,8 @@
-using CarPark.Api.Models;
-using CarPark.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Reservations.Api.Models;
+using Reservations.Api.Services;
 
-namespace CarPark.Api.Controllers
+namespace Reservations.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

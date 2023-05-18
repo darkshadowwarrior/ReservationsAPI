@@ -1,6 +1,6 @@
-using CarPark.Api.Managers;
-using CarPark.Api.Repositories;
-using CarPark.Api.Services;
+using Reservations.Api.Managers;
+using Reservations.Api.Repositories;
+using Reservations.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

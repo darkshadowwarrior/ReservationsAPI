@@ -1,9 +1,9 @@
-﻿using CarPark.Api.Managers;
-using CarPark.Api.Models;
-using CarPark.Api.Repositories;
-using Moq;
+﻿using Moq;
+using Reservations.Api.Managers;
+using Reservations.Api.Models;
+using Reservations.Api.Repositories;
 
-namespace ApiServiceTests.Services
+namespace ApiTests.Services
 {
     public class ReservationManagerTests
     {
