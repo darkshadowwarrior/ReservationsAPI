@@ -21,4 +21,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CarPark.Api\CarPark.Api.csproj" />
+  </ItemGroup>
+
 </Project>
