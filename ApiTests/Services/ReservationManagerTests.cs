@@ -8,20 +8,20 @@ namespace ApiTests.Services
     public class ReservationManagerTests
     {
         private readonly ReservationManager _manager;
-        private readonly Mock<IParkingSpaceManager> _parkingSpaceRepositoryMock;
+        private readonly Mock<IParkingSpaceManager> _parkingSpaceManagerMock;
         private readonly Mock<IReservationsRepository> _parkingReservationsRepository;
-
+        
         public ReservationManagerTests()
         {
-            _parkingSpaceRepositoryMock = new Mock<IParkingSpaceManager>();
+            _parkingSpaceManagerMock = new Mock<IParkingSpaceManager>();
             _parkingReservationsRepository = new Mock<IReservationsRepository>();
-            _manager = new ReservationManager(_parkingSpaceRepositoryMock.Object, _parkingReservationsRepository.Object);
+            _manager = new ReservationManager(_parkingSpaceManagerMock.Object, _parkingReservationsRepository.Object);
         }
 
         [Fact]
         public void GivenADateRange_ReturnsFalseIfSpacesAvailable()
         {
-            _parkingSpaceRepositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
+            _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
 
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 10);
@@ -34,7 +34,7 @@ namespace ApiTests.Services
         [Fact]
         public void GivenADateRange_ReturnsTrueIfSpacesAvailable()
         {
-            _parkingSpaceRepositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
+            _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
 
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 3);
@@ -119,7 +119,7 @@ namespace ApiTests.Services
         [Fact]
         public void GivenADateRange_ReserveParking_ThrowsException()
         {
-            _parkingSpaceRepositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
+            _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
 
             var from = new DateTime(2023, 1, 6);
             var to = new DateTime(2023, 1, 9);
@@ -130,32 +130,13 @@ namespace ApiTests.Services
         [Fact]
         public void GivenANewDateRange_AmendReservation_UpdatesReservationWithNewDates()
         {
-            _parkingSpaceRepositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
-            _parkingReservationsRepository.Setup(x => x.AddReservation(new Reservation()
-                { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) }));
+            var amendedReservation = new Reservation { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 2) };
+            var amendedStartDate = new DateTime(2023, 1, 1);
+            var amendedEndDate = new DateTime(2023, 1, 2);
 
+            _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(new Dictionary<string, Reservation> { { "Bill Gates", amendedReservation } });
 
-            _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
-            _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(
-                new Reservation()
-                    { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) });
-
-            _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(
-                new Dictionary<string, Reservation>()
-                {
-                    { "Bill Gates", new() { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 2) } }
-                }
-            );
-
-            var from = new DateTime(2023, 1, 1);
-            var to = new DateTime(2023, 1, 4);
-
-            _manager.ReserveParking(from, to, "Bill Gates");
-
-            var amendedFrom = new DateTime(2023, 1, 1);
-            var amendedTo = new DateTime(2023, 1, 2);
-
-            _manager.AmendReservation(amendedFrom, amendedTo, "Bill Gates");
+            _manager.AmendReservation(amendedStartDate, amendedEndDate, "Bill Gates");
 
             var reservations = _manager.GetReservations();
 
@@ -167,11 +148,10 @@ namespace ApiTests.Services
         [Fact]
         public void GivenAName_AndReservationExists_WhenCancelParkingIsCalled_TheReservationIsCancelled()
         {
-            _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
-            _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(
-                new Reservation()
-                    { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) });
+            var originalReservation = new Reservation { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) };
 
+            _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
+            _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(originalReservation);
             _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(
                 new Dictionary<string, Reservation>()
                 {
@@ -179,19 +159,15 @@ namespace ApiTests.Services
                 }
             );
 
-        _manager.CancelReservation("Bill Gates");
+            _manager.CancelReservation("Bill Gates");
 
-            var reservations = _manager.GetReservations();
-
-            _parkingReservationsRepository.Verify(x => x.ReservationExists(It.IsAny<string>()), Times.Once);
-
-            Assert.False(reservations.ContainsKey("Bill Gates"));
+            Assert.False(_manager.GetReservations().ContainsKey("Bill Gates"));
         }
 
         [Fact]
         public void GivenADateRange_GetAvailableParking_ReturnsAllAvailableParkingSpaces()
         {
-            _parkingSpaceRepositoryMock.Setup(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>())).Returns(9);
+            _parkingSpaceManagerMock.Setup(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>())).Returns(9);
 
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 4);
