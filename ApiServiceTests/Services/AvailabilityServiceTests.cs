@@ -1,4 +1,5 @@
 ﻿using CarPark.Api.Models;
+using CarPark.Api.Services;
 
 namespace ApiServiceTests.Services
 {

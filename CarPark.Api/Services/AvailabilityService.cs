@@ -1,6 +1,6 @@
 ﻿using CarPark.Api.Models;
 
-namespace ApiServiceTests.Services;
+namespace CarPark.Api.Services;
 
 public class AvailabilityService
 {
