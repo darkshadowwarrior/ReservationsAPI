@@ -1,5 +1,3 @@
-using CarPark.Api.Services;
-
 namespace CarPark.Api.Models;
 
 public class ParkingAvailabilityResponse
