@@ -1,6 +1,6 @@
 ﻿namespace CarPark.Api.Models
 {
-    public class ParkSlot
+    public class ParkingSpace
     {
     }
 }

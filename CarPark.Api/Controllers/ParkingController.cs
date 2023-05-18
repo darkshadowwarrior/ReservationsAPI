@@ -7,9 +7,9 @@ namespace CarPark.Api.Controllers
     [Route("[controller]")]
     public class ParkingController : ControllerBase
     {
-        public List<ParkSlot> GetAvailableSlots(DateTime startDate, DateTime endDate)
+        public List<ParkingSpace> GetAvailableSlots(DateTime startDate, DateTime endDate)
         {
-            return new List<ParkSlot>();
+            return new List<ParkingSpace>();
         }
     }
 }
