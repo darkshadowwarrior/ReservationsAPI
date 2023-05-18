@@ -53,5 +53,16 @@ namespace CarPark.Api.Controllers
                 Name = request.Name
             });
         }
+
+        [HttpPost("CancelParking")]
+        public async Task<ParkingReservationCancellationResponse> CancelParking([FromQuery] ParkingReservationCancellationRequest request)
+        {
+            _manager.CancelParking(request.Name);
+
+            return await Task.FromResult(new ParkingReservationCancellationResponse()
+            {
+                Name = request.Name
+            });
+        }
     }
 }

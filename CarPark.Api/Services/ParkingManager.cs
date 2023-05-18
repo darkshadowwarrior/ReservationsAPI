@@ -1,4 +1,6 @@
-﻿namespace CarPark.Api.Services;
+﻿using CarPark.Api.Models;
+
+namespace CarPark.Api.Services;
 
 
 public interface IParkingManager
@@ -6,32 +8,44 @@ public interface IParkingManager
     bool IsParkingAvailable(DateTime from, DateTime to);
     decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
     void ReserveParking(DateTime from, DateTime to, string? name);
+    Dictionary<string, ParkingReservation> GetReservations();
+    void CancelParking(string? name);
 }
 
 public class ParkingManager : IParkingManager
 {
-    private readonly Dictionary<DateTime, int> _reservations;
-    private readonly Dictionary<string, ParkingReservation> _bookings;
+    private readonly Dictionary<DateTime, int> _parkingSpaceAllocations;
+    private readonly Dictionary<string, ParkingReservation> _parkingReservations;
+
     public ParkingManager()
     {
-        _reservations = new Dictionary<DateTime, int>()
+        _parkingSpaceAllocations = new Dictionary<DateTime, int>()
         {
-            { new DateTime(2023, 1, 1), 9 },
-            { new DateTime(2023, 1, 2), 8 },
-            { new DateTime(2023, 1, 3), 10 },
-            { new DateTime(2023, 1, 4), 9 },
-            { new DateTime(2023, 1, 5), 7 },
-            { new DateTime(2023, 1, 6), 0 },
-            { new DateTime(2023, 1, 7), 0 },
-            { new DateTime(2023, 1, 8), 0 },
-            { new DateTime(2023, 1, 9), 0 },
-            { new DateTime(2023, 1, 10), 1 }
+            { new DateTime(2023, 1, 1), 1 },
+            { new DateTime(2023, 1, 2), 2 },
+            { new DateTime(2023, 1, 3), 0 },
+            { new DateTime(2023, 1, 4), 1 },
+            { new DateTime(2023, 1, 5), 3 },
+            { new DateTime(2023, 1, 6), 10 },
+            { new DateTime(2023, 1, 7), 10 },
+            { new DateTime(2023, 1, 8), 10 },
+            { new DateTime(2023, 1, 9), 10 },
+            { new DateTime(2023, 1, 10), 9 }
         };
 
-        _bookings = new Dictionary<string, ParkingReservation>()
+        _parkingReservations = new Dictionary<string, ParkingReservation>()
         {
-            { "Ian Richards ", new ParkingReservation() { Name = "Ian Richards", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) } }
+            {
+                "Ian Richards ",
+                new ParkingReservation()
+                    { Name = "Ian Richards", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) }
+            }
         };
+    }
+
+    public Dictionary<string, ParkingReservation> GetReservations()
+    {
+        return _parkingReservations;
     }
 
     public void ReserveParking(DateTime from, DateTime to, string? name)
@@ -40,13 +54,39 @@ public class ParkingManager : IParkingManager
         {
             for (DateTime date = from; date <= to; date = date.AddDays(1))
             {
-                _reservations[date] += 1;
+                _parkingSpaceAllocations.TryAdd(date, 0);
+                _parkingSpaceAllocations[date] += 1;
             }
-            _bookings.Add(name, new ParkingReservation() { From = from, To = to, Name = name });
+
+            _parkingReservations.Add(name, new ParkingReservation() { From = from, To = to, Name = name });
         }
         else
         {
-            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
+            throw new UnableToReserveSpaceException(
+                "UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
+        }
+    }
+
+
+    public void AmendReservation(DateTime from, DateTime to, string? name)
+    {
+        if (IsParkingAvailable(from, to))
+        {
+            CancelParking(name);
+            ReserveParking(from, to, name);
+        }
+    }
+
+    public void CancelParking(string? name)
+    {
+        if (name != null && _parkingReservations.TryGetValue(name, out var reservation))
+        {
+            for (DateTime date = reservation.From; date <= reservation.To; date = date.AddDays(1))
+            {
+                _parkingSpaceAllocations[date] -= 1;
+            }
+
+            _parkingReservations.Remove(name);
         }
     }
 
@@ -54,9 +94,9 @@ public class ParkingManager : IParkingManager
     {
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            if (_reservations.TryGetValue(date, out var reservation))
+            if (_parkingSpaceAllocations.TryGetValue(date, out var reservation))
             {
-                if (reservation == 0)
+                if (reservation >= 10)
                 {
                     return false;
                 }
@@ -122,18 +162,6 @@ public class ParkingManager : IParkingManager
     {
         return date.Month is 12 or <= 2;
     }
-
-    public void AmendReservation(DateTime from, DateTime to, string billGates)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class ParkingReservation
-{
-    public DateTime From { get; set; }
-    public DateTime To { get; set; }
-    public string? Name { get; set; }
 }
 
 public class UnableToReserveSpaceException : Exception
