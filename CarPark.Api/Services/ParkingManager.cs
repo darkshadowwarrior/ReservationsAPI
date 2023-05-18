@@ -41,8 +41,8 @@ public class ParkingManager : IParkingManager
             for (DateTime date = from; date <= to; date = date.AddDays(1))
             {
                 _reservations[date] += 1;
-                _bookings.Add(name, new ParkingReservation() { From = from, To = to, Name = name });
             }
+            _bookings.Add(name, new ParkingReservation() { From = from, To = to, Name = name });
         }
         else
         {
