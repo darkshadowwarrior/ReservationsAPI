@@ -9,6 +9,7 @@ namespace CarPark.Api.Services
         ReservationResponse ReserveParking(ReservationRequest request);
         ReservationCancellationResponse CancelParking(ReservationCancellationRequest request);
         AvailabilityResponse GetAvailableParking(AvailabilityRequest request);
+        ReservationResponse AmendReservation(ReservationRequest request);
     }
 
     public class ReservationService : IReservationService
@@ -49,7 +50,7 @@ namespace CarPark.Api.Services
             catch (Exception)
             {
                 response.Status =
-                    "Unable to reserved booking due to insufficient spaces available for the given date range";
+                    "Unable to reserved reservation due to insufficient spaces available for the given date range";
             }
 
             return response;
@@ -84,6 +85,29 @@ namespace CarPark.Api.Services
                 From = request.From,
                 To = request.To
             };
+        }
+
+        public ReservationResponse AmendReservation(ReservationRequest request)
+        {
+            ReservationResponse response = new()
+            {
+                From = request.From,
+                To = request.To,
+                Name = request.Name,
+            };
+
+            try
+            {
+                _manager.AmendReservation(request.From, request.To, request.Name);
+                response.Status = "Reservation Amended";
+            }
+            catch (Exception)
+            {
+                response.Status =
+                    "Unable to amend reservation due to insufficient spaces available for the given date range";
+            }
+
+            return response;
         }
     }
 }

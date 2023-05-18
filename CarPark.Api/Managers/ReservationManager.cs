@@ -9,6 +9,7 @@ public interface IReservationManager
     bool IsParkingAvailable(DateTime from, DateTime to);
     decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
     void ReserveParking(DateTime from, DateTime to, string? name);
+    void AmendReservation(DateTime from, DateTime to, string? name);
     Dictionary<string, Reservation> GetReservations();
     void CancelParking(string? name);
     List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to);
