@@ -1,12 +1,14 @@
+using CarPark.Api.Managers;
 using CarPark.Api.Repositories;
 using CarPark.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<IParkingReservationsRepository, ParkingReservationsRepository>();
-builder.Services.AddSingleton<IParkingSpaceRepository, ParkingSpaceRepository>();
-builder.Services.AddSingleton<IParkingManager, ParkingManager>();
+builder.Services.AddSingleton<IReservationsRepository, ReservationsRepository>();
+builder.Services.AddSingleton<IParkingSpaceManager, ParkingSpaceManager>();
+builder.Services.AddSingleton<IReservationManager, ReservationManager>();
+builder.Services.AddSingleton<IReservationService, ReservationService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

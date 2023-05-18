@@ -1,6 +1,6 @@
 ﻿namespace CarPark.Api.Models;
 
-public class ParkingReservation
+public class Reservation
 {
     public DateTime From { get; set; }
     public DateTime To { get; set; }

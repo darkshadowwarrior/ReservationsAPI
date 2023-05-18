@@ -1,6 +1,6 @@
 ﻿namespace CarPark.Api.Repositories;
 
-public interface IParkingSpaceRepository
+public interface IParkingSpaceManager
 {
     void ReserveSpace(DateTime date);
     void UnReserveSpace(DateTime date);
@@ -8,13 +8,13 @@ public interface IParkingSpaceRepository
     int GetTotalParkingSpacesAvailableByDate(DateTime date);
 }
 
-public class ParkingSpaceRepository : IParkingSpaceRepository
+public class ParkingSpaceManager : IParkingSpaceManager
 {
-    private readonly Dictionary<DateTime, int> _parkingSpaceAllocations;
+    private readonly Dictionary<DateTime, int> _availableParkingSpacesByDate;
 
-    public ParkingSpaceRepository()
+    public ParkingSpaceManager()
     {
-        _parkingSpaceAllocations = new Dictionary<DateTime, int>()
+        _availableParkingSpacesByDate = new Dictionary<DateTime, int>()
         {
             { new DateTime(2023, 1, 1), 1 },
             { new DateTime(2023, 1, 2), 2 },
@@ -27,29 +27,29 @@ public class ParkingSpaceRepository : IParkingSpaceRepository
             { new DateTime(2023, 1, 9), 10 },
             { new DateTime(2023, 1, 10), 9 }
         };
-
     }
+
     public void ReserveSpace(DateTime date)
     {
-        _parkingSpaceAllocations.TryAdd(date, 0);
-        _parkingSpaceAllocations[date] += 1;
+        _availableParkingSpacesByDate.TryAdd(date, 0);
+        _availableParkingSpacesByDate[date] += 1;
     }
 
     public void UnReserveSpace(DateTime date)
     {
-        _parkingSpaceAllocations[date] -= 1;
+        _availableParkingSpacesByDate[date] -= 1;
     }
 
     public bool IsSpaceAvailable(DateTime date)
     {
-        if (!_parkingSpaceAllocations.TryGetValue(date, out var reservation)) return true;
+        if (!_availableParkingSpacesByDate.TryGetValue(date, out var reservation)) return true;
 
         return reservation < 10;
     }
 
     public int GetTotalParkingSpacesAvailableByDate(DateTime date)
     {
-        _parkingSpaceAllocations.TryGetValue(date, out int value);
+        _availableParkingSpacesByDate.TryGetValue(date, out int value);
 
         return (10 - value);
     }

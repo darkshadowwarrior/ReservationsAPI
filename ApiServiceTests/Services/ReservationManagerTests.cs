@@ -1,21 +1,21 @@
-﻿using CarPark.Api.Models;
+﻿using CarPark.Api.Managers;
+using CarPark.Api.Models;
 using CarPark.Api.Repositories;
-using CarPark.Api.Services;
 using Moq;
 
 namespace ApiServiceTests.Services
 {
-    public class ParkingManagerTests
+    public class ReservationManagerTests
     {
-        private readonly ParkingManager _manager;
-        private readonly Mock<IParkingSpaceRepository> _parkingSpaceRepositoryMock;
-        private readonly Mock<IParkingReservationsRepository> _parkingReservationsRepository;
+        private readonly ReservationManager _manager;
+        private readonly Mock<IParkingSpaceManager> _parkingSpaceRepositoryMock;
+        private readonly Mock<IReservationsRepository> _parkingReservationsRepository;
 
-        public ParkingManagerTests()
+        public ReservationManagerTests()
         {
-            _parkingSpaceRepositoryMock = new Mock<IParkingSpaceRepository>();
-            _parkingReservationsRepository = new Mock<IParkingReservationsRepository>();
-            _manager = new ParkingManager(_parkingSpaceRepositoryMock.Object, _parkingReservationsRepository.Object);
+            _parkingSpaceRepositoryMock = new Mock<IParkingSpaceManager>();
+            _parkingReservationsRepository = new Mock<IReservationsRepository>();
+            _manager = new ReservationManager(_parkingSpaceRepositoryMock.Object, _parkingReservationsRepository.Object);
         }
 
         [Fact]
@@ -131,17 +131,17 @@ namespace ApiServiceTests.Services
         public void GivenANewDateRange_AmendReservation_UpdatesReservationWithNewDates()
         {
             _parkingSpaceRepositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
-            _parkingReservationsRepository.Setup(x => x.AddReservation(new ParkingReservation()
+            _parkingReservationsRepository.Setup(x => x.AddReservation(new Reservation()
                 { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) }));
 
 
             _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
             _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(
-                new ParkingReservation()
+                new Reservation()
                     { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) });
 
             _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(
-                new Dictionary<string, ParkingReservation>()
+                new Dictionary<string, Reservation>()
                 {
                     { "Bill Gates", new() { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 2) } }
                 }
@@ -169,11 +169,11 @@ namespace ApiServiceTests.Services
         {
             _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
             _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(
-                new ParkingReservation()
+                new Reservation()
                     { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) });
 
             _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(
-                new Dictionary<string, ParkingReservation>()
+                new Dictionary<string, Reservation>()
                 {
                     { "Steve Jobs", new() { Name = "Steve Jobs", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) } }
                 }

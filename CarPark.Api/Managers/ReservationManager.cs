@@ -1,41 +1,41 @@
 ﻿using CarPark.Api.Models;
 using CarPark.Api.Repositories;
 
-namespace CarPark.Api.Services;
+namespace CarPark.Api.Managers;
 
 
-public interface IParkingManager
+public interface IReservationManager
 {
     bool IsParkingAvailable(DateTime from, DateTime to);
     decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
     void ReserveParking(DateTime from, DateTime to, string? name);
-    Dictionary<string, ParkingReservation> GetReservations();
+    Dictionary<string, Reservation> GetReservations();
     void CancelParking(string? name);
-    List<ParkingSpace> GetAvailableParking(DateTime from, DateTime to);
+    List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to);
 }
 
-public class ParkingManager : IParkingManager
+public class ReservationManager : IReservationManager
 {
-    private readonly IParkingSpaceRepository _parkingSpaceRepository;
-    private readonly IParkingReservationsRepository _parkingReservationsRepository;
-    public ParkingManager(IParkingSpaceRepository parkingSpaceRepository, IParkingReservationsRepository parkingReservationsRepository)
+    private readonly IParkingSpaceManager _parkingSpaceManager;
+    private readonly IReservationsRepository _reservationsRepository;
+    public ReservationManager(IParkingSpaceManager parkingSpaceManager, IReservationsRepository reservationsRepository)
     {
-        _parkingSpaceRepository = parkingSpaceRepository;
-        _parkingReservationsRepository = parkingReservationsRepository;
+        _parkingSpaceManager = parkingSpaceManager;
+        _reservationsRepository = reservationsRepository;
     }
 
-    public Dictionary<string, ParkingReservation> GetReservations()
+    public Dictionary<string, Reservation> GetReservations()
     {
-        return _parkingReservationsRepository.GetReservations();
+        return _reservationsRepository.GetReservations();
     }
 
-    public List<ParkingSpace> GetAvailableParking(DateTime from, DateTime to)
+    public List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to)
     {
-        var spaces = new List<ParkingSpace>();
+        var spaces = new List<SpaceAvailability>();
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            var totalParkingSpacesAvailable = _parkingSpaceRepository.GetTotalParkingSpacesAvailableByDate(date);
-            spaces.Add(new ParkingSpace() { Date = date, SpacesAvailable = totalParkingSpacesAvailable });
+            var totalParkingSpacesAvailable = _parkingSpaceManager.GetTotalParkingSpacesAvailableByDate(date);
+            spaces.Add(new SpaceAvailability() { Date = date, SpacesAvailable = totalParkingSpacesAvailable });
         }
 
         return spaces;
@@ -47,14 +47,14 @@ public class ParkingManager : IParkingManager
         {
             for (DateTime date = from; date <= to; date = date.AddDays(1))
             {
-                _parkingSpaceRepository.ReserveSpace(date);
+                _parkingSpaceManager.ReserveSpace(date);
             }
 
-            _parkingReservationsRepository.AddReservation(new ParkingReservation() { From = from, To = to, Name = name });
+            _reservationsRepository.AddReservation(new Reservation() { From = from, To = to, Name = name });
         }
         else
         {
-            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
+            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ReservationManager threw an exception when trying to reserves space for given date range");
         }
     }
 
@@ -70,15 +70,15 @@ public class ParkingManager : IParkingManager
 
     public void CancelParking(string? name)
     {
-        if (name != null && _parkingReservationsRepository.ReservationExists(name))
+        if (name != null && _reservationsRepository.ReservationExists(name))
         {
-            var reservation = _parkingReservationsRepository.GetReservationByName(name);
+            var reservation = _reservationsRepository.GetReservationByName(name);
             for (DateTime date = reservation.From; date <= reservation.To; date = date.AddDays(1))
             {
-                _parkingSpaceRepository.UnReserveSpace(date);
+                _parkingSpaceManager.UnReserveSpace(date);
             }
 
-            _parkingReservationsRepository.RemoveReservation(name);
+            _reservationsRepository.RemoveReservation(name);
         }
     }
 
@@ -86,7 +86,7 @@ public class ParkingManager : IParkingManager
     {
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            if (!_parkingSpaceRepository.IsSpaceAvailable(date))
+            if (!_parkingSpaceManager.IsSpaceAvailable(date))
             {
                 return false;
             }

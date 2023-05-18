@@ -1,8 +1,7 @@
 namespace CarPark.Api.Models;
 
-public class ParkingReservationResponse
+public class PriceRequest
 {
     public DateTime From { get; set; }
     public DateTime To { get; set; }
-    public string? Name { get; set; }
 }

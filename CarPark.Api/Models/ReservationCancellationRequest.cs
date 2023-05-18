@@ -1,6 +1,6 @@
 namespace CarPark.Api.Models;
 
-public class ParkingReservationCancellationRequest
+public class ReservationCancellationRequest
 {
     public string? Name { get; set; }
 }
