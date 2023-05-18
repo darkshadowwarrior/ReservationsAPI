@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CarPark.Api\CarPark.Api.csproj" />
+    <ProjectReference Include="..\CarPark.Api\Reservations.Api.csproj" />
   </ItemGroup>
 
 </Project>
