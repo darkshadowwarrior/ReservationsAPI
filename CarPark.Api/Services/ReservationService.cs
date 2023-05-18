@@ -7,7 +7,7 @@ namespace CarPark.Api.Services
     {
         PriceResponse GetParkingPriceForDateRange(PriceRequest request);
         ReservationResponse ReserveParking(ReservationRequest request);
-        ReservationCancellationResponse CancelParking(ReservationCancellationRequest request);
+        ReservationCancellationResponse CancelReservation(ReservationCancellationRequest request);
         AvailabilityResponse GetAvailableParking(AvailabilityRequest request);
         ReservationResponse AmendReservation(ReservationRequest request);
     }
@@ -56,7 +56,7 @@ namespace CarPark.Api.Services
             return response;
         }
 
-        public ReservationCancellationResponse CancelParking(ReservationCancellationRequest request)
+        public ReservationCancellationResponse CancelReservation(ReservationCancellationRequest request)
         {
             var response = new ReservationCancellationResponse()
             {
@@ -65,7 +65,7 @@ namespace CarPark.Api.Services
 
             try
             {
-                _manager.CancelParking(request.Name);
+                _manager.CancelReservation(request.Name);
                 response.Status = "Cancelled";
             }
             catch (Exception)

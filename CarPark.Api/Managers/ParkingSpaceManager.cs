@@ -3,7 +3,7 @@
 public interface IParkingSpaceManager
 {
     void ReserveSpace(DateTime date);
-    void UnReserveSpace(DateTime date);
+    void DeallocateSpace(DateTime date);
     bool IsSpaceAvailable(DateTime date);
     int GetTotalParkingSpacesAvailableByDate(DateTime date);
 }
@@ -35,7 +35,7 @@ public class ParkingSpaceManager : IParkingSpaceManager
         _availableParkingSpacesByDate[date] += 1;
     }
 
-    public void UnReserveSpace(DateTime date)
+    public void DeallocateSpace(DateTime date)
     {
         _availableParkingSpacesByDate[date] -= 1;
     }

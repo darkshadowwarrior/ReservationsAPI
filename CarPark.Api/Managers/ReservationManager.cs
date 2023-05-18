@@ -11,7 +11,7 @@ public interface IReservationManager
     void ReserveParking(DateTime from, DateTime to, string? name);
     void AmendReservation(DateTime from, DateTime to, string? name);
     Dictionary<string, Reservation> GetReservations();
-    void CancelParking(string? name);
+    void CancelReservation(string? name);
     List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to);
 }
 
@@ -64,19 +64,19 @@ public class ReservationManager : IReservationManager
     {
         if (IsParkingAvailable(from, to))
         {
-            CancelParking(name);
+            CancelReservation(name);
             ReserveParking(from, to, name);
         }
     }
 
-    public void CancelParking(string? name)
+    public void CancelReservation(string? name)
     {
         if (name != null && _reservationsRepository.ReservationExists(name))
         {
             var reservation = _reservationsRepository.GetReservationByName(name);
             for (DateTime date = reservation.From; date <= reservation.To; date = date.AddDays(1))
             {
-                _parkingSpaceManager.UnReserveSpace(date);
+                _parkingSpaceManager.DeallocateSpace(date);
             }
 
             _reservationsRepository.RemoveReservation(name);

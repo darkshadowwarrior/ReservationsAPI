@@ -39,10 +39,10 @@ namespace CarPark.Api.Controllers
             return await Task.FromResult(_service.AmendReservation(request));
         }
 
-        [HttpPost("CancelParking")]
+        [HttpPost("CancelReservation")]
         public async Task<ReservationCancellationResponse> CancelParking([FromQuery] ReservationCancellationRequest request)
         {
-            return await Task.FromResult(_service.CancelParking(request));
+            return await Task.FromResult(_service.CancelReservation(request));
         }
     }
 }

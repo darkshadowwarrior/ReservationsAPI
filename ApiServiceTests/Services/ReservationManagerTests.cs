@@ -179,7 +179,7 @@ namespace ApiServiceTests.Services
                 }
             );
 
-        _manager.CancelParking("Bill Gates");
+        _manager.CancelReservation("Bill Gates");
 
             var reservations = _manager.GetReservations();
 
