@@ -15,7 +15,7 @@ namespace CarPark.Api.Controllers
             _manager = manager;
         }
 
-        [HttpGet]
+        [HttpGet("IsParkingAvailable")]
         public async Task<ParkingAvailabilityResponse> IsParkingAvailable([FromQuery] ParkingAvailabilityRequest request)
         {
             var result = _manager.IsParkingAvailable(request.From, request.To);
@@ -25,6 +25,19 @@ namespace CarPark.Api.Controllers
                 From = request.From,
                 To = request.To,
                 IsSpaceAvailable = result
+            });
+        }
+
+        [HttpGet("GetParkingPriceForDateRange")]
+        public async Task<ParkingPriceResponse> GetParkingPriceForDateRange([FromQuery] ParkingPriceRequest request)
+        {
+            var result = _manager.GetParkingPriceForDateRange(request.From, request.To);
+
+            return await Task.FromResult(new ParkingPriceResponse()
+            {
+                From = request.From,
+                To = request.To,
+                Price = result
             });
         }
     }

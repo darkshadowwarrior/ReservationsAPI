@@ -1,5 +1,12 @@
 ﻿namespace CarPark.Api.Services;
 
+
+public interface IParkingManager
+{
+    bool IsParkingAvailable(DateTime from, DateTime to);
+    decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
+}
+
 public class ParkingManager : IParkingManager
 {
     private readonly Dictionary<DateTime, int> _reservations;
@@ -23,27 +30,24 @@ public class ParkingManager : IParkingManager
 
     public bool IsParkingAvailable(DateTime from, DateTime to)
     {
-        // Check if any of the dates within the range are already reserved
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
             if (_reservations.TryGetValue(date, out var reservation))
             {
-                // A reservation exists for this date, check if all spaces are occupied
                 if (reservation >= 10)
                 {
-                    return false;  // All spaces are occupied
+                    return false;
                 }
             }
         }
 
-        return true;  // Parking is available for all dates in the range
+        return true;
     }
 
     public decimal GetParkingPriceForDateRange(DateTime from, DateTime to)
     {
         decimal totalCost = 0;
 
-        // Calculate the parking price for each date within the range
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
             decimal dailyPrice = CalculateDailyPrice(date);
@@ -86,14 +90,11 @@ public class ParkingManager : IParkingManager
 
     private bool IsWeekend(DateTime date)
     {
-        // Check if the given date falls on a weekend (Saturday or Sunday)
         return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
     }
 
     private bool IsSummer(DateTime date)
     {
-        // Define your summer season criteria here
-        // For example, assuming summer season is from June 1 to August 31
         return date.Month >= 6 && date.Month <= 8;
     }
 
@@ -101,10 +102,4 @@ public class ParkingManager : IParkingManager
     {
         return date.Month == 12 || date.Month <= 2;
     }
-}
-
-public interface IParkingManager
-{
-    bool IsParkingAvailable(DateTime from, DateTime to);
-    decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
 }
