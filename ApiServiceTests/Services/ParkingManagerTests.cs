@@ -5,6 +5,7 @@ namespace ApiServiceTests.Services
     public class ParkingManagerTests
     {
         private readonly ParkingManager _manager;
+
         public ParkingManagerTests()
         {
             _manager = new ParkingManager();
@@ -110,7 +111,7 @@ namespace ApiServiceTests.Services
             var from = new DateTime(2023, 1, 6);
             var to = new DateTime(2023, 1, 9);
 
-            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, "Bill Gates" ));
+            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, "Bill Gates"));
         }
 
         [Fact]
@@ -126,7 +127,21 @@ namespace ApiServiceTests.Services
 
             _manager.AmendReservation(from, to, "Bill Gates");
 
+            var reservations = _manager.GetReservations();
 
+            Assert.True(reservations.ContainsKey("Bill Gates"));
+            Assert.Equal(reservations["Bill Gates"].From, new DateTime(2023, 1, 1));
+            Assert.Equal(reservations["Bill Gates"].To, new DateTime(2023, 1, 2));
+        }
+
+        [Fact]
+        public void GivenAName_CancelParking_CancelParkingForCustomer()
+        {
+            _manager.CancelParking("Bill Gates");
+
+            var reservations = _manager.GetReservations();
+
+            Assert.False(reservations.ContainsKey("Bill Gates"));
         }
     }
 }
