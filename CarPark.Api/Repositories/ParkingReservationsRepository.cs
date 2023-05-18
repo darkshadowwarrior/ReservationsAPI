@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CarPark.Api.Models;
+﻿using CarPark.Api.Models;
 
 namespace CarPark.Api.Repositories;
 

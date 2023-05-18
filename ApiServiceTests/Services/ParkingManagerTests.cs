@@ -2,7 +2,6 @@
 using CarPark.Api.Repositories;
 using CarPark.Api.Services;
 using Moq;
-using NuGet.Frameworks;
 
 namespace ApiServiceTests.Services
 {
