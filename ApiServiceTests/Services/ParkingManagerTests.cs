@@ -5,7 +5,6 @@ namespace ApiServiceTests.Services
     public class ParkingManagerTests
     {
         private readonly ParkingManager _manager;
-
         public ParkingManagerTests()
         {
             _manager = new ParkingManager();
@@ -111,7 +110,7 @@ namespace ApiServiceTests.Services
             var from = new DateTime(2023, 1, 6);
             var to = new DateTime(2023, 1, 9);
 
-            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, "Bill Gates"));
+            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, "Bill Gates" ));
         }
 
         [Fact]
@@ -130,7 +129,7 @@ namespace ApiServiceTests.Services
             var reservations = _manager.GetReservations();
 
             Assert.True(reservations.ContainsKey("Bill Gates"));
-            Assert.Equal(reservations["Bill Gates"].From, new DateTime(2023, 1, 1));
+            Assert.Equal(reservations["Bill Gates"].From, new DateTime(2023, 1, 1)); 
             Assert.Equal(reservations["Bill Gates"].To, new DateTime(2023, 1, 2));
         }
 
@@ -142,6 +141,20 @@ namespace ApiServiceTests.Services
             var reservations = _manager.GetReservations();
 
             Assert.False(reservations.ContainsKey("Bill Gates"));
+        }
+
+        [Fact]
+        public void GivenADateRange_GetAvailableParking_ReturnsAllAvailableParkingSpaces()
+        {
+            var from = new DateTime(2023, 1, 1);
+            var to = new DateTime(2023, 1, 4);
+
+            var availableSpaces = _manager.GetAvailableParking(from, to);
+
+            Assert.Equal(9, availableSpaces[0].SpacesAvailable);
+            Assert.Equal(8, availableSpaces[1].SpacesAvailable);
+            Assert.Equal(10, availableSpaces[2].SpacesAvailable);
+            Assert.Equal(9, availableSpaces[3].SpacesAvailable);
         }
     }
 }

@@ -10,13 +10,13 @@ public interface IParkingManager
     void ReserveParking(DateTime from, DateTime to, string? name);
     Dictionary<string, ParkingReservation> GetReservations();
     void CancelParking(string? name);
+    List<ParkingSpace> GetAvailableParking(DateTime from, DateTime to);
 }
 
 public class ParkingManager : IParkingManager
 {
     private readonly Dictionary<DateTime, int> _parkingSpaceAllocations;
     private readonly Dictionary<string, ParkingReservation> _parkingReservations;
-
     public ParkingManager()
     {
         _parkingSpaceAllocations = new Dictionary<DateTime, int>()
@@ -35,11 +35,7 @@ public class ParkingManager : IParkingManager
 
         _parkingReservations = new Dictionary<string, ParkingReservation>()
         {
-            {
-                "Ian Richards ",
-                new ParkingReservation()
-                    { Name = "Ian Richards", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) }
-            }
+            { "Ian Richards ", new ParkingReservation() { Name = "Ian Richards", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) } }
         };
     }
 
@@ -62,8 +58,7 @@ public class ParkingManager : IParkingManager
         }
         else
         {
-            throw new UnableToReserveSpaceException(
-                "UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
+            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ParkingManager threw an exception when trying to reserves space for given date range");
         }
     }
 
@@ -162,6 +157,24 @@ public class ParkingManager : IParkingManager
     {
         return date.Month is 12 or <= 2;
     }
+
+    public List<ParkingSpace> GetAvailableParking(DateTime from, DateTime to)
+    {
+        var spaces = new List<ParkingSpace>();
+        for (DateTime date = from; date <= to; date = date.AddDays(1))
+        {
+            _parkingSpaceAllocations.TryGetValue(date, out int value);
+            spaces.Add(new ParkingSpace() {Date = date, SpacesAvailable = (10 - value) });
+        }
+
+        return spaces;
+    }
+}
+
+public class ParkingSpace
+{
+    public DateTime Date { get; set; }
+    public int SpacesAvailable { get; set; }
 }
 
 public class UnableToReserveSpaceException : Exception

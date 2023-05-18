@@ -18,13 +18,13 @@ namespace CarPark.Api.Controllers
         [HttpGet("IsParkingAvailable")]
         public async Task<ParkingAvailabilityResponse> IsParkingAvailable([FromQuery] ParkingAvailabilityRequest request)
         {
-            var result = _manager.IsParkingAvailable(request.From, request.To);
+            var result = _manager.GetAvailableParking(request.From, request.To);
 
             return await Task.FromResult(new ParkingAvailabilityResponse()
             {
                 From = request.From,
                 To = request.To,
-                IsSpaceAvailable = result
+                Spaces = result
             });
         }
 
