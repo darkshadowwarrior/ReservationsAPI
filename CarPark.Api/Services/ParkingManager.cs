@@ -122,6 +122,11 @@ public class ParkingManager : IParkingManager
     {
         return date.Month is 12 or <= 2;
     }
+
+    public void AmendReservation(DateTime from, DateTime to, string billGates)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class ParkingReservation

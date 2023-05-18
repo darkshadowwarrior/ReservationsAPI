@@ -112,5 +112,21 @@ namespace ApiServiceTests.Services
 
             Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, "Bill Gates" ));
         }
+
+        [Fact]
+        public void GivenANewDateRange_AmendReservation_UpdatesReservationWithNewDates()
+        {
+            var from = new DateTime(2023, 1, 1);
+            var to = new DateTime(2023, 1, 4);
+
+            _manager.ReserveParking(from, to, "Bill Gates");
+
+            from = new DateTime(2023, 1, 1);
+            to = new DateTime(2023, 1, 2);
+
+            _manager.AmendReservation(from, to, "Bill Gates");
+
+
+        }
     }
 }
