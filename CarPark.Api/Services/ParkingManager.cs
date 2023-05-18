@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+﻿using CarPark.Api.Models;
 
 namespace CarPark.Api.Services;
 
@@ -11,39 +11,32 @@ public interface IParkingManager
 
 public class ParkingManager : IParkingManager
 {
-    private readonly Dictionary<DateTime, int> _reservations;
+    private readonly Dictionary<DateTime, Allocations> _reservations;
 
     public ParkingManager()
     {
-        _reservations = new Dictionary<DateTime, int>()
+        _reservations = new Dictionary<DateTime, Allocations>()
         {
-            { new DateTime(2023, 1, 1), 7 },
-            { new DateTime(2023, 1, 2), 2 },
-            { new DateTime(2023, 1, 3), 0 },
-            { new DateTime(2023, 1, 4), 1 },
-            { new DateTime(2023, 1, 5), 3 },
-            { new DateTime(2023, 1, 6), 10 },
-            { new DateTime(2023, 1, 7), 10 },
-            { new DateTime(2023, 1, 8), 10 },
-            { new DateTime(2023, 1, 9), 10 },
-            { new DateTime(2023, 1, 10), 9 }
+            { new DateTime(2023, 1, 1), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 9 } },
+            { new DateTime(2023, 1, 2), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 8 } },
+            { new DateTime(2023, 1, 3), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 10 } },
+            { new DateTime(2023, 1, 4), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 9 } },
+            { new DateTime(2023, 1, 5), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 7 } },
+            { new DateTime(2023, 1, 6), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 0 } },
+            { new DateTime(2023, 1, 7), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 0 } },
+            { new DateTime(2023, 1, 8), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 0 } },
+            { new DateTime(2023, 1, 9), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 0 } },
+            { new DateTime(2023, 1, 10), new Allocations { Customers = new List<Customer>() { new() { Name = "Ian Richards" } }, SpacesAvailable = 1 } }
         };
     }
 
-    public void ReserveParking(DateTime from, DateTime to)
+    public void ReserveParking(DateTime from, DateTime to, Customer customer)
     {
         if (IsParkingAvailable(from, to))
         {
             for (DateTime date = from; date <= to; date = date.AddDays(1))
             {
-                if (_reservations.ContainsKey(date))
-                {
-                    _reservations[date] += 1;
-                }
-                else
-                {
-                    _reservations[date] = 1;
-                }
+                _reservations[date].Customers.Add(customer);
             }
         }
         else
@@ -58,7 +51,7 @@ public class ParkingManager : IParkingManager
         {
             if (_reservations.TryGetValue(date, out var reservation))
             {
-                if (reservation >= 10)
+                if (reservation.SpacesAvailable == 0)
                 {
                     return false;
                 }
@@ -74,7 +67,7 @@ public class ParkingManager : IParkingManager
 
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            decimal dailyPrice = CalculateDailyPrice(date);
+            var dailyPrice = CalculateDailyPrice(date);
             totalCost += dailyPrice;
         }
 
@@ -83,12 +76,12 @@ public class ParkingManager : IParkingManager
 
     private decimal CalculateDailyPrice(DateTime date)
     {
-        decimal weekDayPrice = 10.0M;
-        decimal weekendPrice = 15.0M;
-        decimal summerPriceIncrease = 12.0M;
-        decimal winterPriceIncrease = 8.0M;
+        var weekDayPrice = 10.0M;
+        var weekendPrice = 15.0M;
+        var summerPriceIncrease = 12.0M;
+        var winterPriceIncrease = 8.0M;
 
-        decimal pricePerDay = 0.0M;
+        var pricePerDay = 0.0M;
 
         if (IsSummer(date))
         {
@@ -112,17 +105,17 @@ public class ParkingManager : IParkingManager
 
     private bool IsWeekend(DateTime date)
     {
-        return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+        return date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
     }
 
     private bool IsSummer(DateTime date)
     {
-        return date.Month >= 6 && date.Month <= 8;
+        return date.Month is >= 6 and <= 8;
     }
 
     private bool IsWinter(DateTime date)
     {
-        return date.Month == 12 || date.Month <= 2;
+        return date.Month is 12 or <= 2;
     }
 }
 

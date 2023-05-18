@@ -1,4 +1,5 @@
-﻿using CarPark.Api.Services;
+﻿using CarPark.Api.Models;
+using CarPark.Api.Services;
 
 namespace ApiServiceTests.Services
 {
@@ -110,7 +111,7 @@ namespace ApiServiceTests.Services
             var from = new DateTime(2023, 1, 6);
             var to = new DateTime(2023, 1, 9);
 
-            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to));
+            Assert.Throws<UnableToReserveSpaceException>(() => _manager.ReserveParking(from, to, new Customer() { Name = "Bill Gates" }));
         }
     }
 }
