@@ -1,18 +1,25 @@
-﻿using CarPark.Api.Services;
+﻿using CarPark.Api.Repositories;
+using CarPark.Api.Services;
+using Moq;
+using NuGet.Frameworks;
 
 namespace ApiServiceTests.Services
 {
     public class ParkingManagerTests
     {
         private readonly ParkingManager _manager;
+        private readonly Mock<IParkingSpaceRepository> _repositoryMock;
         public ParkingManagerTests()
         {
-            _manager = new ParkingManager();
+            _repositoryMock = new Mock<IParkingSpaceRepository>();
+            _manager = new ParkingManager(_repositoryMock.Object);
         }
 
         [Fact]
         public void GivenADateRange_ReturnsFalseIfSpacesAvailable()
         {
+            _repositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
+
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 10);
 
@@ -24,6 +31,8 @@ namespace ApiServiceTests.Services
         [Fact]
         public void GivenADateRange_ReturnsTrueIfSpacesAvailable()
         {
+            _repositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
+
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 3);
 
@@ -107,6 +116,8 @@ namespace ApiServiceTests.Services
         [Fact]
         public void GivenADateRange_ReserveParking_ThrowsException()
         {
+            _repositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
+
             var from = new DateTime(2023, 1, 6);
             var to = new DateTime(2023, 1, 9);
 
@@ -116,15 +127,17 @@ namespace ApiServiceTests.Services
         [Fact]
         public void GivenANewDateRange_AmendReservation_UpdatesReservationWithNewDates()
         {
+            _repositoryMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
+
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 4);
 
             _manager.ReserveParking(from, to, "Bill Gates");
 
-            from = new DateTime(2023, 1, 1);
-            to = new DateTime(2023, 1, 2);
+            var amendedFrom = new DateTime(2023, 1, 1);
+            var amendedTo = new DateTime(2023, 1, 2);
 
-            _manager.AmendReservation(from, to, "Bill Gates");
+            _manager.AmendReservation(amendedFrom, amendedTo, "Bill Gates");
 
             var reservations = _manager.GetReservations();
 
@@ -146,15 +159,14 @@ namespace ApiServiceTests.Services
         [Fact]
         public void GivenADateRange_GetAvailableParking_ReturnsAllAvailableParkingSpaces()
         {
+            _repositoryMock.Setup(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>())).Returns(9);
+
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 4);
 
             var availableSpaces = _manager.GetAvailableParking(from, to);
 
             Assert.Equal(9, availableSpaces[0].SpacesAvailable);
-            Assert.Equal(8, availableSpaces[1].SpacesAvailable);
-            Assert.Equal(10, availableSpaces[2].SpacesAvailable);
-            Assert.Equal(9, availableSpaces[3].SpacesAvailable);
         }
     }
 }
