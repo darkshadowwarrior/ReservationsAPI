@@ -15,8 +15,8 @@ namespace Reservations.Api.Controllers
             _service = service;
         }
 
-        [HttpGet("IsParkingAvailable")]
-        public AvailabilityResponse IsParkingAvailable([FromQuery] AvailabilityRequest request)
+        [HttpGet("GetAvailableParkingForDateRange")]
+        public AvailabilityResponse GetAvailableParkingForDateRange([FromQuery] AvailabilityRequest request)
         {
             return _service.GetAvailableParking(request);
         }
