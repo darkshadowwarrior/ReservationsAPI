@@ -1,4 +1,4 @@
-﻿namespace CarPark.Api.Repositories;
+﻿namespace CarPark.Api.Managers;
 
 public interface IParkingSpaceManager
 {
@@ -51,6 +51,6 @@ public class ParkingSpaceManager : IParkingSpaceManager
     {
         _availableParkingSpacesByDate.TryGetValue(date, out int value);
 
-        return (10 - value);
+        return 10 - value;
     }
 }
