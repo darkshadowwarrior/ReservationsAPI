@@ -1,6 +1,6 @@
 ﻿namespace CarPark.Api.Services;
 
-public class ParkingManager
+public class ParkingManager : IParkingManager
 {
     private readonly Dictionary<DateTime, int> _reservations;
 
@@ -38,4 +38,9 @@ public class ParkingManager
 
         return true;  // Parking is available for all dates in the range
     }
+}
+
+public interface IParkingManager
+{
+    bool IsParkingAvailable(DateTime from, DateTime to);
 }
