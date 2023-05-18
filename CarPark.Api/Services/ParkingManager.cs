@@ -39,14 +39,28 @@ public class ParkingManager : IParkingManager
         return true;  // Parking is available for all dates in the range
     }
 
-    public double GetParkingPriceForDateRange(DateTime from, DateTime to)
+    public decimal GetParkingPriceForDateRange(DateTime from, DateTime to)
     {
-        throw new NotImplementedException();
+        decimal totalCost = 0;
+
+        // Calculate the parking price for each date within the range
+        for (DateTime date = from; date <= to; date = date.AddDays(1))
+        {
+            decimal dailyPrice = CalculateDailyPrice(date);
+            totalCost += dailyPrice;
+        }
+
+        return totalCost;
+    }
+
+    private decimal CalculateDailyPrice(DateTime date)
+    {
+        return 10.0M;
     }
 }
 
 public interface IParkingManager
 {
     bool IsParkingAvailable(DateTime from, DateTime to);
-    double GetParkingPriceForDateRange(DateTime from, DateTime to);
+    decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
 }

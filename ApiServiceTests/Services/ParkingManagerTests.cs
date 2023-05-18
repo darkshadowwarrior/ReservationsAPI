@@ -27,7 +27,7 @@ namespace ApiServiceTests.Services
 
             var actualPrice = manager.GetParkingPriceForDateRange(from, to);
 
-            double expectedPrice = 100.00;
+            decimal expectedPrice = 100.00M;
             Assert.Equal(expectedPrice, actualPrice);
         }
     }
