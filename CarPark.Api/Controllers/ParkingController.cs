@@ -40,5 +40,18 @@ namespace CarPark.Api.Controllers
                 Price = result
             });
         }
+
+        [HttpPost("ReserveParking")]
+        public async Task<ParkingReservationResponse> ReserveParking([FromQuery] ParkingReservationRequest request)
+        {
+            _manager.ReserveParking(request.From, request.To, request.Name);
+
+            return await Task.FromResult(new ParkingReservationResponse()
+            {
+                From = request.From,
+                To = request.To,
+                Name = request.Name
+            });
+        }
     }
 }
