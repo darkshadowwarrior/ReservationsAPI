@@ -38,9 +38,15 @@ public class ParkingManager : IParkingManager
 
         return true;  // Parking is available for all dates in the range
     }
+
+    public double GetParkingPriceForDateRange(DateTime from, DateTime to)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public interface IParkingManager
 {
     bool IsParkingAvailable(DateTime from, DateTime to);
+    double GetParkingPriceForDateRange(DateTime from, DateTime to);
 }
