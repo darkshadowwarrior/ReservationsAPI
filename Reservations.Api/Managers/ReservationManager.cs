@@ -71,7 +71,9 @@ public class ReservationManager : IReservationManager
 
     public void CancelReservation(string? name)
     {
-        if (name != null && _reservationsRepository.ReservationExists(name))
+        if (name == null) throw new ArgumentNullException(nameof(name));
+        
+        if (_reservationsRepository.ReservationExists(name))
         {
             var reservation = _reservationsRepository.GetReservationByName(name);
             for (DateTime date = reservation.From; date <= reservation.To; date = date.AddDays(1))

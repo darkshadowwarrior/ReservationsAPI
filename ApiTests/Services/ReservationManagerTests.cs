@@ -52,7 +52,7 @@ namespace ApiTests.Services
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 164.0M;
+            var expectedPrice = 164.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -64,7 +64,7 @@ namespace ApiTests.Services
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 240.0M;
+            var expectedPrice = 240.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -76,7 +76,7 @@ namespace ApiTests.Services
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 136.0M;
+            var expectedPrice = 136.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -88,7 +88,7 @@ namespace ApiTests.Services
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 190.0M;
+            var expectedPrice = 190.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -100,7 +100,7 @@ namespace ApiTests.Services
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 80.0M;
+            var expectedPrice = 80.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -109,10 +109,10 @@ namespace ApiTests.Services
         {
             var from = new DateTime(2023, 4, 1);
             var to = new DateTime(2023, 4, 10);
+            var expectedPrice = 120.0M;
 
             var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
 
-            decimal expectedPrice = 120.0M;
             Assert.Equal(expectedPrice, actualPrice);
         }
 
@@ -128,21 +128,46 @@ namespace ApiTests.Services
         }
 
         [Fact]
+        public void GivenNull_CancelReservation_ThrowsException()
+        {
+            Assert.Throws<ArgumentNullException>(() => _manager.CancelReservation(null));
+        }
+
+        [Fact]
+        public void GivenAInvalidReservationName_CancelReservation_ThrowsException()
+        {
+            Assert.Throws<ReservationNotFoundException>(() => _manager.CancelReservation("Bob Johnson"));
+        }
+
+        [Fact]
+        public void GivenADateRange_ReserveParking_ReservesParkingWithGivenDates()
+        {
+            var startDate = new DateTime(2023, 1, 1);
+            var endDate = new DateTime(2023, 1, 2);
+
+            _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
+
+            _manager.ReserveParking(startDate, endDate, "Bill Gates");
+
+            _parkingSpaceManagerMock.Verify(x => x.ReserveSpace(It.IsAny<DateTime>()), Times.Exactly(2));
+            _parkingReservationsRepository.Verify(x => x.AddReservation(It.IsAny<Reservation>()), Times.Once);
+        }
+
+        [Fact]
         public void GivenANewDateRange_AmendReservation_UpdatesReservationWithNewDates()
         {
-            var amendedReservation = new Reservation { Name = "Bill Gates", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 2) };
             var amendedStartDate = new DateTime(2023, 1, 1);
             var amendedEndDate = new DateTime(2023, 1, 2);
 
-            _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(new Dictionary<string, Reservation> { { "Bill Gates", amendedReservation } });
+            _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(true);
+            _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
+            _parkingReservationsRepository.Setup(x => x.GetReservationByName(It.IsAny<string>())).Returns(new Reservation { From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) });
 
             _manager.AmendReservation(amendedStartDate, amendedEndDate, "Bill Gates");
 
-            var reservations = _manager.GetReservations();
-
-            Assert.True(reservations.ContainsKey("Bill Gates"));
-            Assert.Equal(reservations["Bill Gates"].From, new DateTime(2023, 1, 1)); 
-            Assert.Equal(reservations["Bill Gates"].To, new DateTime(2023, 1, 2));
+            _parkingSpaceManagerMock.Verify(x => x.DeallocateSpace(It.IsAny<DateTime>()), Times.Exactly(6));
+            _parkingSpaceManagerMock.Verify(x => x.ReserveSpace(It.IsAny<DateTime>()), Times.Exactly(2));
+            _parkingReservationsRepository.Verify(x => x.RemoveReservation(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -152,16 +177,11 @@ namespace ApiTests.Services
 
             _parkingReservationsRepository.Setup(x => x.ReservationExists(It.IsAny<string>())).Returns(true);
             _parkingReservationsRepository.Setup(x => x.GetReservationByName("Bill Gates")).Returns(originalReservation);
-            _parkingReservationsRepository.Setup(x => x.GetReservations()).Returns(
-                new Dictionary<string, Reservation>()
-                {
-                    { "Steve Jobs", new() { Name = "Steve Jobs", From = new DateTime(2023, 1, 1), To = new DateTime(2023, 1, 6) } }
-                }
-            );
 
             _manager.CancelReservation("Bill Gates");
 
-            Assert.False(_manager.GetReservations().ContainsKey("Bill Gates"));
+            _parkingSpaceManagerMock.Verify(x => x.DeallocateSpace(It.IsAny<DateTime>()), Times.Exactly(6));
+            _parkingReservationsRepository.Verify(x => x.RemoveReservation(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -172,9 +192,9 @@ namespace ApiTests.Services
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 4);
 
-            var availableSpaces = _manager.GetAvailableParking(from, to);
+            _manager.GetAvailableParking(from, to);
 
-            Assert.Equal(9, availableSpaces[0].SpacesAvailable);
+            _parkingSpaceManagerMock.Verify(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>()), Times.Exactly(4));
         }
     }
 }
