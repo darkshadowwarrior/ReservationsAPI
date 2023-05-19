@@ -23,13 +23,13 @@ namespace Reservations.Api.Services
 
         public PriceResponse GetParkingPriceForDateRange(PriceRequest request)
         {
-            var result = _manager.GetParkingPriceForDateRange(request.From, request.To);
+            var result = _manager.GetParkingPricesForDateRange(request.From, request.To);
 
             return new PriceResponse()
             {
                 From = request.From,
                 To = request.To,
-                Price = result
+                Prices = result
             };
         }
 

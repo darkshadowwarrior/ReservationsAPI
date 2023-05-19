@@ -7,7 +7,7 @@ namespace Reservations.Api.Managers;
 public interface IReservationManager
 {
     bool IsParkingAvailable(DateTime from, DateTime to);
-    decimal GetParkingPriceForDateRange(DateTime from, DateTime to);
+    List<Space> GetParkingPricesForDateRange(DateTime from, DateTime to);
     void ReserveParking(DateTime from, DateTime to, string? name);
     void AmendReservation(DateTime from, DateTime to, string? name);
     Dictionary<string, Reservation> GetReservations();
@@ -102,9 +102,16 @@ public class ReservationManager : IReservationManager
         return Enumerable.Range(0, 1 + to.Subtract(from).Days).Select(offset => from.AddDays(offset));
     }
 
-    public decimal GetParkingPriceForDateRange(DateTime from, DateTime to)
+    public List<Space> GetParkingPricesForDateRange(DateTime from, DateTime to)
     {
-        return GetDateRange(from, to).Sum(_pricingManager.GetPrice);
+        var prices = new List<Space>();
+
+        for (DateTime date = from; date <= to; date = date.AddDays(1))
+        {
+            prices.Add(new Space { Date = date, Price = _pricingManager.GetPrice(date) } );
+        }
+
+        return prices;
     }
 }
 
