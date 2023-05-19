@@ -15,10 +15,10 @@ namespace Reservations.Api.Controllers
             _service = service;
         }
 
-        [HttpGet("GetAvailableParkingForDateRange")]
-        public AvailabilityResponse GetAvailableParkingForDateRange([FromQuery] AvailabilityRequest request)
+        [HttpGet("GetSpaceAvailabilitiesForDateRange")]
+        public AvailabilityResponse GetSpaceAvailabilitiesForDateRange([FromQuery] AvailabilityRequest request)
         {
-            return _service.GetAvailableParking(request);
+            return _service.GetSpaceAvailabilities(request);
         }
 
         [HttpGet("GetParkingPriceForDateRange")]
@@ -40,7 +40,7 @@ namespace Reservations.Api.Controllers
         }
 
         [HttpPost("CancelReservation")]
-        public ReservationCancellationResponse CancelParking([FromQuery] ReservationCancellationRequest request)
+        public ReservationCancellationResponse CancelReservation([FromQuery] ReservationCancellationRequest request)
         {
             return _service.CancelReservation(request);
         }
