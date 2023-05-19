@@ -10,16 +10,18 @@ namespace ApiTests.Services
         private readonly ReservationManager _manager;
         private readonly Mock<IParkingSpaceManager> _parkingSpaceManagerMock;
         private readonly Mock<IReservationsRepository> _parkingReservationsRepository;
+        private readonly Mock<IPricingManager> _pricingManagerMock;
         
         public ReservationManagerTests()
         {
             _parkingSpaceManagerMock = new Mock<IParkingSpaceManager>();
             _parkingReservationsRepository = new Mock<IReservationsRepository>();
-            _manager = new ReservationManager(_parkingSpaceManagerMock.Object, _parkingReservationsRepository.Object);
+            _pricingManagerMock = new Mock<IPricingManager>();
+            _manager = new ReservationManager(_parkingSpaceManagerMock.Object, _parkingReservationsRepository.Object, _pricingManagerMock.Object);
         }
 
         [Fact]
-        public void GivenADateRange_ReturnsFalseIfSpacesAvailable()
+        public void GivenADateRange_ReturnsFalseIfSpacesNotAvailable()
         {
             _parkingSpaceManagerMock.Setup(x => x.IsSpaceAvailable(It.IsAny<DateTime>())).Returns(false);
 
@@ -44,77 +46,7 @@ namespace ApiTests.Services
             Assert.True(spacesAvailable);
         }
 
-        [Fact]
-        public void GivenAWeekDayDateRange_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 7, 1);
-            var to = new DateTime(2023, 7, 7);
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            var expectedPrice = 164.0M;
-            Assert.Equal(expectedPrice, actualPrice);
-        }
-
-        [Fact]
-        public void GivenADateRangeOverAWeekend_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 7, 1);
-            var to = new DateTime(2023, 7, 10);
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            var expectedPrice = 240.0M;
-            Assert.Equal(expectedPrice, actualPrice);
-        }
-
-        [Fact]
-        public void GivenAWeekDayDateRangAndInWinter_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 1, 1);
-            var to = new DateTime(2023, 1, 7);
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            var expectedPrice = 136.0M;
-            Assert.Equal(expectedPrice, actualPrice);
-        }
-
-        [Fact]
-        public void GivenADateRangeOverAWeekendAndInWinter_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 2, 1);
-            var to = new DateTime(2023, 2, 10);
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            var expectedPrice = 190.0M;
-            Assert.Equal(expectedPrice, actualPrice);
-        }
-
-        [Fact]
-        public void GivenAWeekDayDateRangNotInWinterOrSummer_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 10, 1);
-            var to = new DateTime(2023, 10, 7);
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            var expectedPrice = 80.0M;
-            Assert.Equal(expectedPrice, actualPrice);
-        }
-
-        [Fact]
-        public void GivenADateRangeOverAWeekendNotInWinterOrSummer_GetParkingPriceForDateRange_ReturnsPriceForParking()
-        {
-            var from = new DateTime(2023, 4, 1);
-            var to = new DateTime(2023, 4, 10);
-            var expectedPrice = 120.0M;
-
-            var actualPrice = _manager.GetParkingPriceForDateRange(from, to);
-
-            Assert.Equal(expectedPrice, actualPrice);
-        }
+        
 
         [Fact]
         public void GivenADateRange_ReserveParking_ThrowsException()

@@ -19,10 +19,13 @@ public class ReservationManager : IReservationManager
 {
     private readonly IParkingSpaceManager _parkingSpaceManager;
     private readonly IReservationsRepository _reservationsRepository;
-    public ReservationManager(IParkingSpaceManager parkingSpaceManager, IReservationsRepository reservationsRepository)
+    private readonly IPricingManager _pricingManager;
+
+    public ReservationManager(IParkingSpaceManager parkingSpaceManager, IReservationsRepository reservationsRepository, IPricingManager pricingManager)
     {
         _parkingSpaceManager = parkingSpaceManager;
         _reservationsRepository = reservationsRepository;
+        _pricingManager = pricingManager;
     }
 
     public Dictionary<string, Reservation> GetReservations()
@@ -91,72 +94,17 @@ public class ReservationManager : IReservationManager
 
     public bool IsParkingAvailable(DateTime from, DateTime to)
     {
-        for (DateTime date = from; date <= to; date = date.AddDays(1))
-        {
-            if (!_parkingSpaceManager.IsSpaceAvailable(date))
-            {
-                return false;
-            }
-        }
+        return GetDateRange(from, to).Any(_parkingSpaceManager.IsSpaceAvailable);
+    }
 
-        return true;
+    public static IEnumerable<DateTime> GetDateRange(DateTime from, DateTime to)
+    {
+        return Enumerable.Range(0, 1 + to.Subtract(from).Days).Select(offset => from.AddDays(offset));
     }
 
     public decimal GetParkingPriceForDateRange(DateTime from, DateTime to)
     {
-        decimal totalCost = 0;
-
-        for (DateTime date = from; date <= to; date = date.AddDays(1))
-        {
-            var dailyPrice = CalculateDailyPrice(date);
-            totalCost += dailyPrice;
-        }
-
-        return totalCost;
-    }
-
-    private decimal CalculateDailyPrice(DateTime date)
-    {
-        var weekDayPrice = 10.0M;
-        var weekendPrice = 15.0M;
-        var summerPriceIncrease = 12.0M;
-        var winterPriceIncrease = 8.0M;
-
-        var pricePerDay = 0.0M;
-
-        if (IsSummer(date))
-        {
-            pricePerDay += summerPriceIncrease;
-        }
-        else if (IsWinter(date))
-        {
-            pricePerDay += winterPriceIncrease;
-        }
-
-        if (IsWeekend(date))
-        {
-            pricePerDay += weekendPrice;
-            return pricePerDay;
-        }
-
-        pricePerDay += weekDayPrice;
-
-        return pricePerDay;
-    }
-
-    private bool IsWeekend(DateTime date)
-    {
-        return date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
-    }
-
-    private bool IsSummer(DateTime date)
-    {
-        return date.Month is >= 6 and <= 8;
-    }
-
-    private bool IsWinter(DateTime date)
-    {
-        return date.Month is 12 or <= 2;
+        return GetDateRange(from, to).Sum(_pricingManager.GetPrice);
     }
 }
 
