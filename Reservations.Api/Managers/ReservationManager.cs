@@ -104,14 +104,14 @@ public class ReservationManager : IReservationManager
 
     public List<Space> GetParkingPricesForDateRange(DateTime from, DateTime to)
     {
-        var prices = new List<Space>();
+        var spaces = new List<Space>();
 
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            prices.Add(new Space { Date = date, Price = _pricingManager.GetPrice(date) } );
+            spaces.Add(new Space { Date = date, Price = _pricingManager.GetPrice(date) } );
         }
 
-        return prices;
+        return spaces;
     }
 }
 
