@@ -8,7 +8,7 @@ namespace Reservations.Api.Services
         PriceResponse GetParkingPriceForDateRange(PriceRequest request);
         ReservationResponse ReserveParking(ReservationRequest request);
         ReservationCancellationResponse CancelReservation(ReservationCancellationRequest request);
-        AvailabilityResponse GetAvailableParking(AvailabilityRequest request);
+        AvailabilityResponse GetSpaceAvailabilities(AvailabilityRequest request);
         ReservationResponse AmendReservation(ReservationRequest request);
     }
 
@@ -49,8 +49,7 @@ namespace Reservations.Api.Services
             }
             catch (Exception)
             {
-                response.Status =
-                    "Unable to reserved reservation due to insufficient spaces available for the given date range";
+                response.Status = $"Unable to reserved reservation due to insufficient spaces available for the given date range {request.From} - {request.To}";
             }
 
             return response;
@@ -77,7 +76,7 @@ namespace Reservations.Api.Services
 
         }
 
-        public AvailabilityResponse GetAvailableParking(AvailabilityRequest request)
+        public AvailabilityResponse GetSpaceAvailabilities(AvailabilityRequest request)
         {
             return new AvailabilityResponse
             {
@@ -104,7 +103,7 @@ namespace Reservations.Api.Services
             catch (Exception)
             {
                 response.Status =
-                    "Unable to amend reservation due to insufficient spaces available for the given date range";
+                    $"Unable to amend reservation due to insufficient spaces available for the given date range {request.From} - {request.To}";
             }
 
             return response;
