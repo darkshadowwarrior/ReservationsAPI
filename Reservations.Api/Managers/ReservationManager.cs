@@ -12,7 +12,7 @@ public interface IReservationManager
     void AmendReservation(DateTime from, DateTime to, string? name);
     Dictionary<string, Reservation> GetReservations();
     void CancelReservation(string? name);
-    List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to);
+    List<SpaceAvailability> GetSpaceAvailabilities(DateTime from, DateTime to);
 }
 
 public class ReservationManager : IReservationManager
@@ -33,12 +33,12 @@ public class ReservationManager : IReservationManager
         return _reservationsRepository.GetReservations();
     }
 
-    public List<SpaceAvailability> GetAvailableParking(DateTime from, DateTime to)
+    public List<SpaceAvailability> GetSpaceAvailabilities(DateTime from, DateTime to)
     {
         var spaces = new List<SpaceAvailability>();
         for (DateTime date = from; date <= to; date = date.AddDays(1))
         {
-            var totalParkingSpacesAvailable = _parkingSpaceManager.GetTotalParkingSpacesAvailableByDate(date);
+            var totalParkingSpacesAvailable = _parkingSpaceManager.GetTotalSpaceAvailabilitiesByDate(date);
             spaces.Add(new SpaceAvailability() { Date = date, SpacesAvailable = totalParkingSpacesAvailable });
         }
 
@@ -58,7 +58,7 @@ public class ReservationManager : IReservationManager
         }
         else
         {
-            throw new UnableToReserveSpaceException("UnableToReserveSpaceException: ReservationManager threw an exception when trying to reserves space for given date range");
+            throw new UnableToReserveSpaceException($"UnableToReserveSpaceException: ReservationManager threw an exception when trying to reserves space for given date range {from} - {to}");
         }
     }
 
@@ -88,7 +88,7 @@ public class ReservationManager : IReservationManager
         }
         else
         {
-            throw new ReservationNotFoundException("ReservationNotFoundException: Reservation not found in reservations");
+            throw new ReservationNotFoundException($"ReservationNotFoundException: Reservation not found in reservations for {name}");
         }
     }
 

@@ -81,7 +81,7 @@ namespace Reservations.Api.Services
         {
             return new AvailabilityResponse
             {
-                Spaces = _manager.GetAvailableParking(request.From, request.To),
+                Spaces = _manager.GetSpaceAvailabilities(request.From, request.To),
                 From = request.From,
                 To = request.To
             };

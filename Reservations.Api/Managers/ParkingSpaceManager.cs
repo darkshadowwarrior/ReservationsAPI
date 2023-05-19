@@ -5,7 +5,7 @@ public interface IParkingSpaceManager
     void ReserveSpace(DateTime date);
     void DeallocateSpace(DateTime date);
     bool IsSpaceAvailable(DateTime date);
-    int GetTotalParkingSpacesAvailableByDate(DateTime date);
+    int GetTotalSpaceAvailabilitiesByDate(DateTime date);
 }
 
 public class ParkingSpaceManager : IParkingSpaceManager
@@ -47,7 +47,7 @@ public class ParkingSpaceManager : IParkingSpaceManager
         return reservation < 10;
     }
 
-    public int GetTotalParkingSpacesAvailableByDate(DateTime date)
+    public int GetTotalSpaceAvailabilitiesByDate(DateTime date)
     {
         _availableParkingSpacesByDate.TryGetValue(date, out int value);
 

@@ -119,14 +119,14 @@ namespace ApiTests.Services
         [Fact]
         public void GivenADateRange_GetAvailableParking_ReturnsAllAvailableParkingSpaces()
         {
-            _parkingSpaceManagerMock.Setup(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>())).Returns(9);
+            _parkingSpaceManagerMock.Setup(x => x.GetTotalSpaceAvailabilitiesByDate(It.IsAny<DateTime>())).Returns(9);
 
             var from = new DateTime(2023, 1, 1);
             var to = new DateTime(2023, 1, 4);
 
-            _manager.GetAvailableParking(from, to);
+            _manager.GetSpaceAvailabilities(from, to);
 
-            _parkingSpaceManagerMock.Verify(x => x.GetTotalParkingSpacesAvailableByDate(It.IsAny<DateTime>()), Times.Exactly(4));
+            _parkingSpaceManagerMock.Verify(x => x.GetTotalSpaceAvailabilitiesByDate(It.IsAny<DateTime>()), Times.Exactly(4));
         }
     }
 }
