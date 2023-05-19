@@ -3,21 +3,20 @@ using Reservations.Api.Managers;
 using Reservations.Api.Models;
 using Reservations.Api.Repositories;
 
-namespace ApiTests.Services
+namespace ApiTests.Managers
 {
     public class ReservationManagerTests
     {
         private readonly ReservationManager _manager;
         private readonly Mock<IParkingSpaceManager> _parkingSpaceManagerMock;
         private readonly Mock<IReservationsRepository> _parkingReservationsRepository;
-        private readonly Mock<IPricingManager> _pricingManagerMock;
-        
+
         public ReservationManagerTests()
         {
             _parkingSpaceManagerMock = new Mock<IParkingSpaceManager>();
             _parkingReservationsRepository = new Mock<IReservationsRepository>();
-            _pricingManagerMock = new Mock<IPricingManager>();
-            _manager = new ReservationManager(_parkingSpaceManagerMock.Object, _parkingReservationsRepository.Object, _pricingManagerMock.Object);
+            Mock<IPricingManager> pricingManagerMock = new();
+            _manager = new ReservationManager(_parkingSpaceManagerMock.Object, _parkingReservationsRepository.Object, pricingManagerMock.Object);
         }
 
         [Fact]

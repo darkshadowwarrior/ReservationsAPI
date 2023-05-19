@@ -2,14 +2,13 @@
 using Reservations.Api.Managers;
 using Reservations.Api.Models;
 using Reservations.Api.Services;
-using System;
 
 namespace ApiTests.Services
 {
     public class ReservationServiceTests
     {
         private readonly ReservationService _reservationService;
-        private Mock<IReservationManager> _reservationManagerMock;
+        private readonly Mock<IReservationManager> _reservationManagerMock;
         public ReservationServiceTests()
         {
             _reservationManagerMock = new Mock<IReservationManager>();
@@ -92,7 +91,7 @@ namespace ApiTests.Services
         public void GivenARequestWithNoNameSet_CancelReservation_ThrowsException()
         {
             _reservationManagerMock.Setup(x => x.CancelReservation(null)).Throws<ReservationNotFoundException>(null);
-            var request = new ReservationCancellationRequest { };
+            var request = new ReservationCancellationRequest();
 
             var response = _reservationService.CancelReservation(request);
 

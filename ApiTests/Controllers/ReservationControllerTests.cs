@@ -7,7 +7,7 @@ namespace ApiTests.Controllers
 {
     public class ReservationControllerTests
     {
-        private ReservationController _controller;
+        private readonly ReservationController _controller;
         private readonly Mock<IReservationService> _reservationService;
 
         public ReservationControllerTests()

@@ -35,24 +35,23 @@ public class ReservationManager : IReservationManager
 
     public List<SpaceAvailability> GetSpaceAvailabilities(DateTime from, DateTime to)
     {
-        var spaces = new List<SpaceAvailability>();
-        for (DateTime date = from; date <= to; date = date.AddDays(1))
-        {
-            var totalParkingSpacesAvailable = _parkingSpaceManager.GetTotalSpaceAvailabilitiesByDate(date);
-            spaces.Add(new SpaceAvailability() { Date = date, SpacesAvailable = totalParkingSpacesAvailable });
-        }
+        var availableSpaces = new List<SpaceAvailability>();
+        
+        GetDateRange(from, to).ForEach(date => availableSpaces.Add(
+            new SpaceAvailability()
+            {
+                Date = date, 
+                SpacesAvailable = _parkingSpaceManager.GetTotalSpaceAvailabilitiesByDate(date)
+            }));
 
-        return spaces;
+        return availableSpaces;
     }
 
     public void ReserveParking(DateTime from, DateTime to, string? name)
     {
         if (name != null && IsParkingAvailable(from, to))
         {
-            for (DateTime date = from; date <= to; date = date.AddDays(1))
-            {
-                _parkingSpaceManager.ReserveSpace(date);
-            }
+            GetDateRange(from, to).ForEach(_parkingSpaceManager.ReserveSpace);
 
             _reservationsRepository.AddReservation(new Reservation() { From = from, To = to, Name = name });
         }
@@ -79,10 +78,8 @@ public class ReservationManager : IReservationManager
         if (_reservationsRepository.ReservationExists(name))
         {
             var reservation = _reservationsRepository.GetReservationByName(name);
-            for (DateTime date = reservation.From; date <= reservation.To; date = date.AddDays(1))
-            {
-                _parkingSpaceManager.DeallocateSpace(date);
-            }
+
+            GetDateRange(reservation.From, reservation.To).ForEach(_parkingSpaceManager.DeallocateSpace);
 
             _reservationsRepository.RemoveReservation(name);
         }
@@ -97,19 +94,22 @@ public class ReservationManager : IReservationManager
         return GetDateRange(from, to).Any(_parkingSpaceManager.IsSpaceAvailable);
     }
 
-    public static IEnumerable<DateTime> GetDateRange(DateTime from, DateTime to)
+    public static List<DateTime> GetDateRange(DateTime from, DateTime to)
     {
-        return Enumerable.Range(0, 1 + to.Subtract(from).Days).Select(offset => from.AddDays(offset));
+        return Enumerable.Range(0, 1 + to.Subtract(from).Days).Select(offset => from.AddDays(offset)).ToList();
     }
 
     public List<Space> GetParkingPricesForDateRange(DateTime from, DateTime to)
     {
+        
         var spaces = new List<Space>();
 
-        for (DateTime date = from; date <= to; date = date.AddDays(1))
-        {
-            spaces.Add(new Space { Date = date, Price = _pricingManager.GetPrice(date) } );
-        }
+        GetDateRange(from, to).ForEach(date => spaces.Add(
+            new Space
+            {
+                Date = date, 
+                Price = _pricingManager.GetPrice(date)
+            }));
 
         return spaces;
     }
