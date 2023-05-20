@@ -5,6 +5,7 @@ using Reservations.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<IPricingManager, PricingManager>();
 builder.Services.AddSingleton<IReservationsRepository, ReservationsRepository>();
 builder.Services.AddSingleton<IParkingSpaceManager, ParkingSpaceManager>();
 builder.Services.AddSingleton<IReservationManager, ReservationManager>();
