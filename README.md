@@ -8,5 +8,3 @@ There are unit tests provided for the ReservationManager class as this class is 
 The Api has also been manually tested using swagger to ensure the API is running as expected.
 
 Total time take on this project over the course of a day was around 6 hours
-
-After a second glance today 19/05/2023 I notice a missing requirement and some other issues. They have been rectified in the pricing branch but not merged into main/master as yet
